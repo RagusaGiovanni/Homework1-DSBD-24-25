@@ -20,6 +20,7 @@ def run():
             # --- AUTH Service Tests ---
             print("\n--- AUTH Service Tests ---")
             for utente in utenti:
+                # Registra l'utente
                 print(f"\n--- Test: RegisterUser for {utente['email']} ---")
                 response = proxy_stub.ForwardRequest(proxy_pb2.ProxyUserRequest(
                     service="auth_service",
@@ -29,6 +30,7 @@ def run():
                 ))
                 print(f"RegisterUser Response: {response.status}")
 
+                # Registra i ticker associati all'utente
                 for ticker in utente["tickers"]:
                     print(f"\n--- Test: RegisterTicker for {utente['email']} with ticker {ticker} ---")
                     response = proxy_stub.ForwardRequest(proxy_pb2.ProxyUserRequest(
@@ -72,6 +74,17 @@ def run():
                         print(f"GetAverage Response: Status={response.status}, Average={response.average}")
                     else:
                         print(f"GetAverage Response: Status={response.status}")
+
+            # Test: Cancella un utente
+            print("\n--- AUTH Service Cleanup ---")
+            for utente in utenti:
+                print(f"\n--- Test: DeleteUser for {utente['email']} ---")
+                response = proxy_stub.ForwardRequest(proxy_pb2.ProxyUserRequest(
+                    service="auth_service",
+                    method="DeleteUser",
+                    email=utente["email"]
+                ))
+                print(f"DeleteUser Response: {response.status}")
 
     except grpc.RpcError as e:
         print(f"Errore gRPC: {e.code()} - {e.details()}")
