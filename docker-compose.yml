@@ -1,0 +1,68 @@
+services:
+  datacollector_service:
+    build: ./datacollector_service
+    container_name: datacollector_service
+    ports:
+      - "5004:5004"
+    depends_on:
+      - database
+    networks:
+      - my_network
+    environment:
+      DB_HOST: mysql_db
+      DB_USER: root
+      DB_PASSWORD: example
+      DB_NAME: finance_data
+
+  stock_service:
+    build: ./stock_service
+    container_name: stock_service
+    ports:
+      - "5002:5002"
+    depends_on:
+      - database
+    networks:
+      - my_network
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - my_network
+
+  proxy_service:
+    build: ./proxy_service
+    ports:
+      - "5005:5005"
+    depends_on:
+      - redis
+      - auth_service
+    networks:
+      - my_network
+
+  auth_service:
+    build: ./auth_service
+    ports:
+      - "5001:5001"
+    depends_on:
+      - database
+    networks:
+      - my_network
+
+  database:
+    image: mysql:8.0
+    container_name: mysql_db
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: finance_data
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - my_network
+
+networks:
+  my_network:

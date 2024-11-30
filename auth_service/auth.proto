@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+service AuthService {
+  rpc RegisterUser(AuthUserRequest) returns (AuthUserResponse);
+  rpc UpdateUser(AuthUserRequest) returns (AuthUserResponse);
+  rpc DeleteUser(AuthUserRequest) returns (AuthUserResponse);
+}
+
+message AuthUserRequest {
+  string email = 1;
+  string ticker = 2;
+}
+
+message AuthUserResponse {
+  string status = 1;
+}
